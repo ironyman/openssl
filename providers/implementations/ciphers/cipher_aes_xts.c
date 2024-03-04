@@ -290,3 +290,4 @@ const OSSL_DISPATCH ossl_aes##kbits##xts_functions[] = {                       \
 
 IMPLEMENT_cipher(xts, XTS, 256, AES_XTS_FLAGS);
 IMPLEMENT_cipher(xts, XTS, 128, AES_XTS_FLAGS);
+IMPLEMENT_cipher(xts, XTS, 192, AES_XTS_FLAGS);

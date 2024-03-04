@@ -182,6 +182,7 @@ void openssl_add_all_ciphers_int(void)
     EVP_add_cipher(EVP_aes_256_ocb());
 #endif
     EVP_add_cipher(EVP_aes_256_xts());
+    EVP_add_cipher(EVP_aes_192_xts());
     EVP_add_cipher(EVP_aes_256_ccm());
     EVP_add_cipher(EVP_aes_256_wrap());
     EVP_add_cipher_alias(SN_id_aes256_wrap, "aes256-wrap");

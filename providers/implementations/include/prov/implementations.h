@@ -70,6 +70,7 @@ extern const OSSL_DISPATCH ossl_aes256ctr_functions[];
 extern const OSSL_DISPATCH ossl_aes192ctr_functions[];
 extern const OSSL_DISPATCH ossl_aes128ctr_functions[];
 extern const OSSL_DISPATCH ossl_aes256xts_functions[];
+extern const OSSL_DISPATCH ossl_aes192xts_functions[];
 extern const OSSL_DISPATCH ossl_aes128xts_functions[];
 #ifndef OPENSSL_NO_OCB
 extern const OSSL_DISPATCH ossl_aes256ocb_functions[];

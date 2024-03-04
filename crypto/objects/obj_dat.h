@@ -10,7 +10,7 @@
  */
 
 /* Serialized OID's */
-static const unsigned char so[8476] = {
+static const unsigned char so[8484] = {
     0x2A,0x86,0x48,0x86,0xF7,0x0D,                 /* [    0] OBJ_rsadsi */
     0x2A,0x86,0x48,0x86,0xF7,0x0D,0x01,            /* [    6] OBJ_pkcs */
     0x2A,0x86,0x48,0x86,0xF7,0x0D,0x02,0x02,       /* [   13] OBJ_md2 */
@@ -1182,9 +1182,10 @@ static const unsigned char so[8476] = {
     0x55,0x1D,0x49,                                /* [ 8466] OBJ_alt_signature_algorithm */
     0x55,0x1D,0x4A,                                /* [ 8469] OBJ_alt_signature_value */
     0x55,0x1D,0x4B,                                /* [ 8472] OBJ_associated_information */
+    0x2B,0x6F,0x02,0x8C,0x53,0x00,0x01,0x03,       /* [ 8475] OBJ_aes_192_xts */
 };
 
-#define NUM_NID 1320
+#define NUM_NID 1321
 static const ASN1_OBJECT nid_objs[NUM_NID] = {
     {"UNDEF", "undefined", NID_undef},
     {"rsadsi", "RSA Data Security, Inc.", NID_rsadsi, 6, &so[0]},
@@ -2506,9 +2507,10 @@ static const ASN1_OBJECT nid_objs[NUM_NID] = {
     {"altSignatureAlgorithm", "X509v3 Alternative Signature Algorithm", NID_alt_signature_algorithm, 3, &so[8466]},
     {"altSignatureValue", "X509v3 Alternative Signature Value", NID_alt_signature_value, 3, &so[8469]},
     {"associatedInformation", "X509v3 Associated Information", NID_associated_information, 3, &so[8472]},
+    {"AES-192-XTS", "aes-192-xts", NID_aes_192_xts, 8, &so[8475]},
 };
 
-#define NUM_SN 1311
+#define NUM_SN 1312
 static const unsigned int sn_objs[NUM_SN] = {
      364,    /* "AD_DVCS" */
      419,    /* "AES-128-CBC" */
@@ -3821,9 +3823,10 @@ static const unsigned int sn_objs[NUM_SN] = {
      160,    /* "x509Crl" */
     1093,    /* "x509ExtAdmission" */
     1289,    /* "zstd" */
+    1320,    /* "aes-192-xts" */
 };
 
-#define NUM_LN 1311
+#define NUM_LN 1312
 static const unsigned int ln_objs[NUM_LN] = {
      363,    /* "AD Time Stamping" */
      405,    /* "ANSI X9.62" */
@@ -4132,6 +4135,7 @@ static const unsigned int ln_objs[NUM_LN] = {
      428,    /* "aes-256-ofb" */
     1200,    /* "aes-256-siv" */
      914,    /* "aes-256-xts" */
+    1320,    /* "aes-192-xts" */
      376,    /* "algorithm" */
     1066,    /* "aria-128-cbc" */
     1120,    /* "aria-128-ccm" */
@@ -5138,7 +5142,7 @@ static const unsigned int ln_objs[NUM_LN] = {
      125,    /* "zlib compression" */
 };
 
-#define NUM_OBJ 1177
+#define NUM_OBJ 1178
 static const unsigned int obj_objs[NUM_OBJ] = {
        0,    /* OBJ_undef                        0 */
      181,    /* OBJ_iso                          1 */
@@ -5894,6 +5898,7 @@ static const unsigned int obj_objs[NUM_OBJ] = {
      781,    /* OBJ_hmac_sha1                    1 3 6 1 5 5 8 1 2 */
      913,    /* OBJ_aes_128_xts                  1 3 111 2 1619 0 1 1 */
      914,    /* OBJ_aes_256_xts                  1 3 111 2 1619 0 1 2 */
+     1320,   /* OBJ_aes_192_xts                  1 3 111 2 1619 0 1 3 */
       58,    /* OBJ_netscape_cert_extension      2 16 840 1 113730 1 */
       59,    /* OBJ_netscape_data_type           2 16 840 1 113730 2 */
      438,    /* OBJ_pilotAttributeType           0 9 2342 19200300 100 1 */

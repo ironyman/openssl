@@ -189,6 +189,7 @@ static const OSSL_ALGORITHM_CAPABLE deflt_ciphers[] = {
     ALG(PROV_NAMES_AES_192_CTR, ossl_aes192ctr_functions),
     ALG(PROV_NAMES_AES_128_CTR, ossl_aes128ctr_functions),
     ALG(PROV_NAMES_AES_256_XTS, ossl_aes256xts_functions),
+    ALG(PROV_NAMES_AES_192_XTS, ossl_aes192xts_functions),
     ALG(PROV_NAMES_AES_128_XTS, ossl_aes128xts_functions),
 #ifndef OPENSSL_NO_OCB
     ALG(PROV_NAMES_AES_256_OCB, ossl_aes256ocb_functions),

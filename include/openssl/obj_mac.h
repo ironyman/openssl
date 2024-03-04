@@ -3170,10 +3170,16 @@
 #define NID_aes_128_xts         913
 #define OBJ_aes_128_xts         OBJ_ieee_siswg,0L,1L,1L
 
+
 #define SN_aes_256_xts          "AES-256-XTS"
 #define LN_aes_256_xts          "aes-256-xts"
 #define NID_aes_256_xts         914
 #define OBJ_aes_256_xts         OBJ_ieee_siswg,0L,1L,2L
+
+#define SN_aes_192_xts          "AES-192-XTS"
+#define LN_aes_192_xts          "aes-192-xts"
+#define NID_aes_192_xts         1320
+#define OBJ_aes_192_xts         OBJ_ieee_siswg,0L,1L,3L
 
 #define SN_aes_128_cfb1         "AES-128-CFB1"
 #define LN_aes_128_cfb1         "aes-128-cfb1"
