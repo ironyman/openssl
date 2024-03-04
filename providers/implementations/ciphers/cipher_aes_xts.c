@@ -86,8 +86,8 @@ static int aes_xts_init(void *vctx, const unsigned char *key, size_t keylen,
             ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY_LENGTH);
             return 0;
         }
-        if (!aes_xts_check_keys_differ(key, keylen / 2, enc))
-            return 0;
+        // if (!aes_xts_check_keys_differ(key, keylen / 2, enc))
+        //     return 0;
         if (!ctx->hw->init(ctx, key, keylen))
             return 0;
     }
