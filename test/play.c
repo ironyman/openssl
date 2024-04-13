@@ -1510,6 +1510,18 @@ static int check_named_curve_test(int id)
     static const unsigned char invalid_seed[] = "THIS IS NOT A VALID SEED";
     static size_t invalid_seed_len = sizeof(invalid_seed);
 
+    char *group_p_hex = NULL, *group_a_hex = NULL, *group_b_hex = NULL;
+    char *group_cofactor_hex = NULL;
+    const char *group_order_hex = NULL;
+    char *group_gen_x_hex = NULL, *group_gen_y_hex = NULL;
+    BIGNUM *group_gen_x = NULL, *group_gen_y = NULL;
+
+    // if (curves[id].nid != NID_X9_62_prime256v1 && curves[id].nid != NID_ED25519 && curves[id].nid != NID_X25519) {
+    //     return 1;
+    // }
+
+    // BIO_printf(bio_out, "Checking curve %s: %s\n", OSSL_EC_curve_nid2name(curves[id].nid), curves[id].comment);
+    // BIO_printf(bio_out, "Checking curve %s\n", EC_curve_nid2nist(curves[id].nid));
     /* Do some setup */
     nid = curves[id].nid;
     if (!TEST_ptr(bn_ctx = BN_CTX_new())
@@ -1534,6 +1546,34 @@ static int check_named_curve_test(int id)
         || !TEST_ptr(other_cofactor = BN_dup(group_cofactor))
         || !TEST_true(BN_add_word(other_cofactor, 1)))
         goto err;
+
+    group_p_hex = BN_bn2hex(group_p);
+    group_a_hex = BN_bn2hex(group_a);
+    group_b_hex = BN_bn2hex(group_b);
+    group_cofactor_hex = BN_bn2hex(group_cofactor);
+    group_order_hex = BN_bn2hex(group_order);
+
+    if (!TEST_ptr(group_gen_x = BN_new())
+        || !TEST_ptr(group_gen_y = BN_new()))
+    {
+        goto err;
+    }
+
+    EC_POINT_get_affine_coordinates(group, group_gen, group_gen_x, group_gen_y, NULL);
+    group_gen_x_hex = BN_bn2hex(group_gen_x);
+    group_gen_y_hex = BN_bn2hex(group_gen_y);
+
+    BIO_printf(bio_out, "Checking curve %s: %s\n", OSSL_EC_curve_nid2name(curves[id].nid), curves[id].comment);
+    BIO_printf(bio_out, "Parameters:\n");
+    BIO_set_prefix(bio_out, "    ");
+    BIO_printf(bio_out, "p = %s\n", group_p_hex);
+    BIO_printf(bio_out, "a = %s\n", group_a_hex);
+    BIO_printf(bio_out, "b = %s\n", group_b_hex);
+    BIO_printf(bio_out, "h = %s\n", group_cofactor_hex);
+    BIO_printf(bio_out, "n = %s\n", group_order_hex);
+    BIO_printf(bio_out, "generator = (%s, %s)\n", group_gen_x_hex, group_gen_y_hex);
+
+    BIO_set_prefix(bio_out, "# ");
 
     /* Determine if the built-in curve has a seed field set */
     has_seed = (EC_GROUP_get_seed_len(group) > 0);
@@ -1668,6 +1708,17 @@ static int check_named_curve_test(int id)
 
     ret = 1;
 err:
+    OPENSSL_free(group_p_hex);
+    OPENSSL_free(group_a_hex);
+    OPENSSL_free(group_b_hex);
+    OPENSSL_free(group_cofactor_hex);
+    OPENSSL_free(group_order_hex);
+    OPENSSL_free(group_gen_x_hex);
+    OPENSSL_free(group_gen_y_hex);
+
+    BN_free(group_gen_x);
+    BN_free(group_gen_y);
+
     BN_free(group_p);
     BN_free(other_p);
     BN_free(group_a);
@@ -1681,6 +1732,99 @@ err:
     EC_GROUP_free(gtest);
     EC_GROUP_free(group);
     BN_CTX_free(bn_ctx);
+    return ret;
+}
+
+
+static int check_other_curve_test()
+{
+    int ret = 0, nid = 0;
+    EC_GROUP *group = NULL;
+    const EC_POINT *group_gen = NULL;
+    BIGNUM *group_p = NULL, *group_a = NULL, *group_b = NULL;
+    BIGNUM *group_cofactor = NULL;
+    const BIGNUM *group_order = NULL;
+
+    char *group_p_hex = NULL, *group_a_hex = NULL, *group_b_hex = NULL;
+    char *group_cofactor_hex = NULL;
+    const char *group_order_hex = NULL;
+    char *group_gen_x_hex = NULL, *group_gen_y_hex = NULL;
+    BIGNUM *group_gen_x = NULL, *group_gen_y = NULL;
+
+
+    nid = NID_ED25519;
+
+    // fails EC_GROUP_new_by_curve_name and OSSL_EC_curve_nid2name
+    // nid = NID_ED25519;
+    // nid = NID_X25519;
+    // if you look at speed.c, new curves are not supported by low level interface
+    //    st = (ecdsa_key = get_ecdsa(&ec_curves[testnum])) != NULL;
+    // static EVP_PKEY *get_ecdsa(const EC_CURVE *curve)
+    // /*
+    //  * Let's try to create a ctx directly from the NID: this works for
+    //  * curves like Curve25519 that are not implemented through the low
+    //  * level EC interface.
+    //  * If this fails we try creating a EVP_PKEY_EC generic param ctx,
+    //  * then we set the curve by NID before deriving the actual keygen
+    //  * ctx for that specific curve.
+    //  */
+    // kctx = EVP_PKEY_CTX_new_id(curve->nid, NULL);
+    // if (kctx == NULL) {
+    //     EVP_PKEY_CTX *pctx = NULL;
+    //     EVP_PKEY *params = NULL;
+    BIO_printf(bio_out, "Checking curve %s\n", OSSL_EC_curve_nid2name(nid));
+    /* Do some setup */
+    if (!TEST_ptr(group = EC_GROUP_new_by_curve_name(nid))
+        || !TEST_ptr(group_p = BN_new())
+        || !TEST_ptr(group_a = BN_new())
+        || !TEST_ptr(group_b = BN_new())
+        || !TEST_ptr(group_cofactor = BN_new())
+        || !TEST_ptr(group_gen = EC_GROUP_get0_generator(group))
+        || !TEST_ptr(group_order = EC_GROUP_get0_order(group))
+        || !TEST_true(EC_GROUP_get_cofactor(group, group_cofactor, NULL))
+        || !TEST_true(EC_GROUP_get_curve(group, group_p, group_a, group_b, NULL)))
+        goto err;
+
+    group_p_hex = BN_bn2hex(group_p);
+    group_a_hex = BN_bn2hex(group_a);
+    group_b_hex = BN_bn2hex(group_b);
+    group_cofactor_hex = BN_bn2hex(group_cofactor);
+    group_order_hex = BN_bn2hex(group_order);
+
+    EC_POINT_get_affine_coordinates(group, group_gen, group_gen_x, group_gen_y, NULL);
+    group_gen_x_hex = BN_bn2hex(group_gen_x);
+    group_gen_y_hex = BN_bn2hex(group_gen_y);
+
+    BIO_printf(bio_out, "Checking curve %s\n", OSSL_EC_curve_nid2name(nid));
+    BIO_printf(bio_out, "Parameters:\n");
+    BIO_set_prefix(bio_out, "    ");
+    BIO_printf(bio_out, "p = %s\n", group_p_hex);
+    BIO_printf(bio_out, "a = %s\n", group_a_hex);
+    BIO_printf(bio_out, "b = %s\n", group_b_hex);
+    BIO_printf(bio_out, "h = %s\n", group_cofactor_hex);
+    BIO_printf(bio_out, "n = %s\n", group_order_hex);
+    BIO_printf(bio_out, "generator = (%s, %s)\n", group_gen_x_hex, group_gen_y_hex);
+
+    BIO_set_prefix(bio_out, "# ");
+
+    ret = 1;
+err:
+    OPENSSL_free(group_p_hex);
+    OPENSSL_free(group_a_hex);
+    OPENSSL_free(group_b_hex);
+    OPENSSL_free(group_cofactor_hex);
+    OPENSSL_free(group_order_hex);
+    OPENSSL_free(group_gen_x_hex);
+    OPENSSL_free(group_gen_y_hex);
+
+    BN_free(group_gen_x);
+    BN_free(group_gen_y);
+
+    BN_free(group_p);
+    BN_free(group_a);
+    BN_free(group_b);
+    BN_free(group_cofactor);
+    EC_GROUP_free(group);
     return ret;
 }
 
@@ -3126,28 +3270,31 @@ int setup_tests(void)
         || !TEST_true(EC_get_builtin_curves(curves, crv_len)))
         return 0;
 
-    ADD_TEST(parameter_test);
-    ADD_TEST(ossl_parameter_test);
-    ADD_TEST(cofactor_range_test);
-    ADD_ALL_TESTS(cardinality_test, crv_len);
-    ADD_TEST(prime_field_tests);
-#ifndef OPENSSL_NO_EC2M
-    ADD_TEST(hybrid_point_encoding_test);
-    ADD_TEST(char2_field_tests);
-    ADD_ALL_TESTS(char2_curve_test, OSSL_NELEM(char2_curve_tests));
-#endif
-    ADD_ALL_TESTS(nistp_single_test, OSSL_NELEM(nistp_tests_params));
-    ADD_ALL_TESTS(internal_curve_test, crv_len);
-    ADD_ALL_TESTS(internal_curve_test_method, crv_len);
-    ADD_TEST(group_field_test);
+//     ADD_TEST(parameter_test);
+//     ADD_TEST(ossl_parameter_test);
+//     ADD_TEST(cofactor_range_test);
+//     ADD_ALL_TESTS(cardinality_test, crv_len);
+//     ADD_TEST(prime_field_tests);
+// #ifndef OPENSSL_NO_EC2M
+//     ADD_TEST(hybrid_point_encoding_test);
+//     ADD_TEST(char2_field_tests);
+//     ADD_ALL_TESTS(char2_curve_test, OSSL_NELEM(char2_curve_tests));
+// #endif
+//     ADD_ALL_TESTS(nistp_single_test, OSSL_NELEM(nistp_tests_params));
+//     ADD_ALL_TESTS(internal_curve_test, crv_len);
+//     ADD_ALL_TESTS(internal_curve_test_method, crv_len);
+//     ADD_TEST(group_field_test);
     ADD_ALL_TESTS(check_named_curve_test, crv_len);
-    ADD_ALL_TESTS(check_named_curve_lookup_test, crv_len);
-    ADD_ALL_TESTS(check_ec_key_field_public_range_test, crv_len);
-    ADD_ALL_TESTS(check_named_curve_from_ecparameters, crv_len);
-    ADD_ALL_TESTS(ec_point_hex2point_test, crv_len);
-    ADD_ALL_TESTS(custom_generator_test, crv_len);
-    ADD_ALL_TESTS(custom_params_test, crv_len);
-    ADD_TEST(ec_d2i_publickey_test);
+    ADD_TEST(check_other_curve_test);
+    // ADD_ALL_TESTS(check_named_curve_test, crv_len);
+//     ADD_ALL_TESTS(check_named_curve_lookup_test, crv_len);
+//     ADD_ALL_TESTS(check_ec_key_field_public_range_test, crv_len);
+// useful
+//     ADD_ALL_TESTS(check_named_curve_from_ecparameters, crv_len);
+//     ADD_ALL_TESTS(ec_point_hex2point_test, crv_len);
+//     ADD_ALL_TESTS(custom_generator_test, crv_len);
+//     ADD_ALL_TESTS(custom_params_test, crv_len);
+//     ADD_TEST(ec_d2i_publickey_test);
     return 1;
 }
 

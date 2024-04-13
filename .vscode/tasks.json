@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "windows": {
+        "options": {
+            "shell": {
+                "executable": "powershell.exe",
+                "args": [
+                    "-command",
+                    "& { if (test-path ${workspaceFolder}\\profile.ps1) { . ${workspaceFolder}\\profile.ps1 } };"
+                ]
+            }
+        },
+    },
+    "tasks": [
+        {
+            "label": "Setup",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/",
+            },
+            "windows": {
+                "command": [
+                    "Set-Content -value ('pushd;\n& \"\"\"' + (resolve-path 'C:\\Program Files\\Microsoft Visual Studio\\*\\*\\Common7\\Tools\\Launch-VsDevShell.ps1').path + '\"\"\" -Arch $env:PROCESSOR_ARCHITECTURE -HostArch $env:PROCESSOR_ARCHITECTURE;\npopd') -path '${workspaceFolder}\\profile.ps1';",
+                ],
+            },
+        },
+        {
+            "label": "Build play",
+            "type": "shell",
+            "windows": {
+                "command": [
+                    "nmake test\\play.exe"
+                ]
+            },
+            "linux": {
+                "command": [
+                    "make test/play",
+                ]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+    ]
+}
